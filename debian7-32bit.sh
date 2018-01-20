@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Script 
-# 
+# Script Copyright www.yonatankanu.blogspot.co.id
+# Mod by Yonatan Kanu as Thorn SSH
 # ==================================================
 # 
 
@@ -87,38 +87,25 @@ echo "<pre>Setup by Yonatan Kanu | 085707136028</pre>" > /home/vps/public_html/i
 wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/nifira123/debian7_32bit/master/vps.conf"
 service nginx restart
 
-
 # install openvpn
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/ca.crt"
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/dh1024.pem"
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/openvpn.conf"
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/server.conf"
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/server.crt"
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/server.key"
-wget -O /etc/openvpn/openvpn "https://rawgit.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/update-resolf-conf"
+wget -O /etc/openvpn/openvpn.tar "https://raw.github.com/arieonline/autoscript/master/conf/openvpn-debian.tar"
 cd /etc/openvpn/
+tar xf openvpn.tar
+wget -O /etc/openvpn/1194.conf "https://raw.githubusercontent.com/rizal180499/Auto-Installer-VPS/master/conf/1194.conf"
 service openvpn restart
 sysctl -w net.ipv4.ip_forward=1
 sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-wget -O /etc/iptables.up.rules "https://raw.githubusercontent.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/iptables.up.rules"
-sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
-MYIP=`curl -s ifconfig.me`;
-MYIP2="s/xxxxxxxxx/$MYIP/g";
-sed -i $MYIP2 /etc/iptables.up.rules;
-iptables-restore < /etc/iptables.up.rules
+iptables -t nat -I POSTROUTING -s 192.168.100.0/24 -o eth0 -j MASQUERADE
+iptables-save > /etc/iptables_yg_baru_dibikin.conf
+wget -O /etc/network/if-up.d/iptables "https://raw.githubusercontent.com/nifira123/debian7_32bit/master/iptables"
+chmod +x /etc/network/if-up.d/iptables
 service openvpn restart
 
 #konfigurasi openvpn
 cd /etc/openvpn/
-wget -O /etc/openvpn/client.ovpn "https://raw.githubusercontent.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/openvpn/client.ovpn"
+wget -O /etc/openvpn/client.ovpn "https://raw.githubusercontent.com/nifira123/debian7_32bit/master/client-1194.conf"
 sed -i $MYIP2 /etc/openvpn/client.ovpn;
-PASS=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 15 | head -n 1`;
-useradd -M -s /bin/false man20820
-echo "man20820$PASS" | chpasswd
-echo "man20820" > pass.txt
-echo "$PASS" >> pass.txt
-tar cf client.tar client.ovpn pass.txt
-cp client.tar /home/vps/public_html/
+cp client.ovpn /home/vps/public_html/
 
 cd
 # install badvpn
@@ -157,21 +144,12 @@ service ssh restart
 # install dropbear
 apt-get -y install dropbear
 sed -i 's/NO_START=1/NO_START=0/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=20820/g' /etc/default/dropbear
-sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 109 -p 110"/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_PORT=22/DROPBEAR_PORT=443/g' /etc/default/dropbear
+sed -i 's/DROPBEAR_EXTRA_ARGS=/DROPBEAR_EXTRA_ARGS="-p 80 -p 109 -p 110"/g' /etc/default/dropbear
 echo "/bin/false" >> /etc/shells
+echo "/usr/sbin/nologin" >> /etc/shells
 service ssh restart
 service dropbear restart
-
-# install stunnel 
-apt-get install stunnel4 -y
-wget -O /etc/stunnel/stunnel.conf "https://raw.githubusercontent.com/man20820/script-autoinstaller-ssh-ssl-stunnel-vps-debian-7/master/stunnel.conf"
-openssl genrsa -out key.pem 2048
-openssl req -new -x509 -key key.pem -out cert.pem -days 1095
-cat key.pem cert.pem >> /etc/stunnel/stunnel.pem
-sed -i 's/ENABLED=0/ENABLED=1/g' /etc/default/stunnel4
-service stunnel4 restart
-
 
 # install vnstat gui
 cd /home/vps/public_html/
@@ -233,7 +211,7 @@ service webmin restart
 
 # download script
 cd /usr/bin
-wget -O menu "https://raw.githubusercontent.com/zulizar/cobbaSSH/master/menu.sh"
+wget -O menu "https://raw.githubusercontent.com/yonatankanu/debian7_32bit/master/menu.sh"
 wget -O usernew "https://raw.githubusercontent.com/zulizar/cobbaSSH/master/usernew.sh"
 wget -O trial "https://raw.githubusercontent.com/zulizar/cobbaSSH/master/trial.sh"
 wget -O hapus "https://raw.githubusercontent.com/yonatankanu/debian7_32bit/master/hapus.sh"
