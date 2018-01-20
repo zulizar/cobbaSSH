@@ -19,11 +19,5 @@ echo -e "11) Cek Kualitas VPS	= bench-network"
 echo -e "12) Cek RAM VPS	= ps-mem"
 echo -e "13) informasi tentang script auto install	= about"
 echo -e "14) Banner SSH = nano /etc/thornssh
-echo -e "=========================THORN SSH============================"
-echo -e "ALL SUPPORTED by Yonatan Kanu as THORN SSH"
-echo -e "FB	: https://www.facebook.com/kanu.nugraha"
-echo -e "WhatsApp	: 085707136028"
-echo -e "Website	: http://yonatankanu.blogspot.co.id/"
-echo -e "Website	: https://yonatankanu.wordpress.com/"
-
+echo -e "=========================Rumah SSH============================"
 echo -e ""
